@@ -79,6 +79,15 @@ th { font-size: 13px; color: var(--muted); font-weight: 700; background: var(--s
 td:first-child { font-family: var(--font-display); font-size: 17px; white-space: nowrap; }
 tr:last-child td { border-bottom: 0; }
 
+/* 怪獸名冊 */
+.roster { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.roster li { background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 12px 10px 14px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
+.roster img { height: 96px; width: 100%; object-fit: contain; margin-bottom: 6px; }
+.roster h3 { font-size: 18px; }
+.roster .stars { color: var(--sun-deep); letter-spacing: 1px; font-size: 14px; }
+.roster .stars i { font-style: normal; color: var(--line); }
+.roster p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
 /* 每月流程 */
 .month { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: s; }
 .month li { background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 6px; counter-increment: s; }
@@ -127,6 +136,7 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
   .hero h1 { font-size: 42px; }
   .hero img { max-width: 260px; order: -1; }
   .month { grid-template-columns: 1fr 1fr; }
+  .roster { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .outcomes, .two { grid-template-columns: 1fr; }
   .oc img { height: 110px; }
   td:first-child { white-space: normal; }
@@ -164,6 +174,23 @@ footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line)
         </tbody>
       </table>
     </div>
+  </section>
+
+  <section>
+    <h2>10 隻怪獸</h2>
+    <p class="muted" style="margin-bottom:14px">脾氣星星越多，體力起伏越大：可能衝很高，也可能一下掉很多。</p>
+    <ul class="roster">
+      <li><img src="img/turtle_happy.webp" alt=""><h3>晶殼龜</h3><span class="stars" aria-label="脾氣 2 顆星">★★<i>★★★</i></span><p>背上的晶片殼越長越厚</p></li>
+      <li><img src="img/leopard_happy.webp" alt=""><h3>綠光豹</h3><span class="stars" aria-label="脾氣 1 顆星">★<i>★★★★</i></span><p>跑起來會發出綠光</p></li>
+      <li><img src="img/owl_happy.webp" alt=""><h3>搜尋鴞</h3><span class="stars" aria-label="脾氣 1 顆星">★<i>★★★★</i></span><p>大眼睛什麼都找得到</p></li>
+      <li><img src="img/mouse_happy.webp" alt=""><h3>記憶鼠</h3><span class="stars" aria-label="脾氣 5 顆星">★★★★★</span><p>把每件事都記在耳朵裡</p></li>
+      <li><img src="img/badger_happy.webp" alt=""><h3>天線獾</h3><span class="stars" aria-label="脾氣 2 顆星">★★<i>★★★</i></span><p>頭上天線收得到所有訊號</p></li>
+      <li><img src="img/elephant_happy.webp" alt=""><h3>老鐵象</h3><span class="stars" aria-label="脾氣 5 顆星">★★★★★</span><p>個子大，心情起伏也大</p></li>
+      <li><img src="img/horse_happy.webp" alt=""><h3>雷角馬</h3><span class="stars" aria-label="脾氣 2 顆星">★★<i>★★★</i></span><p>閃電角一充飽就暴衝</p></li>
+      <li><img src="img/fox_happy.webp" alt=""><h3>先知狐</h3><span class="stars" aria-label="脾氣 3 顆星">★★★<i>★★</i></span><p>額頭寶石看得見未來（嗎？）</p></li>
+      <li><img src="img/lizard_happy.webp" alt=""><h3>紅芯蜥</h3><span class="stars" aria-label="脾氣 4 顆星">★★★★<i>★</i></span><p>背上的尖刺是一排排晶片</p></li>
+      <li><img src="img/fish_happy.webp" alt=""><h3>光纖魚</h3><span class="stars" aria-label="脾氣 5 顆星">★★★★★</span><p>在光纖裡游得飛快</p></li>
+    </ul>
   </section>
 
   <section>

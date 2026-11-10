@@ -366,7 +366,7 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
         <li><b>右上角「大人小字」</b><p>打開後，會在小朋友用語下方顯示 FCN 正式用語。</p></li>
       </ol>
     </section>
-    <p class="fine">這是示意原型：除了晶殼龜，其他怪獸是暫時的簡圖，正式插畫製作中。委託金用與正式遊戲相同的公式估算，但路徑數較少，數字會有些微差異。試玩時每次出發都是新的隨機路線；正式遊戲裡全場走同一條路。</p>
+    <p class="fine">這是示意原型。委託金用與正式遊戲相同的公式估算，但路徑數較少，數字會有些微差異。試玩時每次出發都是新的隨機路線；正式遊戲裡全場走同一條路。</p>
     <p><a class="back-link" href="./">← 回到遊戲說明</a></p>
   </aside>
 </div>
@@ -376,15 +376,15 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
   const VOL = { m1: .41733, m2: .380935, m3: .332163, m4: .832806, m5: .477661, m6: .855489, m7: .461249, m8: .58868, m9: .721912, m10: .839613 };
   const MONS = [
     { t: "m1", img: "turtle", name: "晶殼龜", type: "shell", color: "#4cc9a6", line: "背上的晶片殼越長越厚" },
-    { t: "m2", name: "綠光豹", type: "leopard", color: "#8bd346", line: "跑起來會發出綠光" },
-    { t: "m3", name: "搜尋鴞", type: "owl", color: "#6fa8ff", line: "大眼睛什麼都找得到" },
-    { t: "m4", name: "記憶鼠", type: "mouse", color: "#b79cff", line: "把每件事都記在耳朵裡" },
-    { t: "m5", name: "天線獾", type: "antenna", color: "#ffb547", line: "頭上天線收得到所有訊號" },
-    { t: "m6", name: "老鐵象", type: "elephant", color: "#9db2cc", line: "個子大，心情起伏也大" },
-    { t: "m7", name: "雷角馬", type: "horse", color: "#ff7a8a", line: "閃電角一充飽就暴衝" },
-    { t: "m8", name: "先知狐", type: "fox", color: "#e9ecf5", line: "額頭寶石看得見未來（嗎？）" },
-    { t: "m9", name: "紅芯蜥", type: "lizard", color: "#e8505b", line: "背上的尖刺是一排排晶片" },
-    { t: "m10", name: "光纖魚", type: "fish", color: "#46d1e6", line: "在光纖裡游得飛快" },
+    { t: "m2", img: "leopard", name: "綠光豹", type: "leopard", color: "#8bd346", line: "跑起來會發出綠光" },
+    { t: "m3", img: "owl", name: "搜尋鴞", type: "owl", color: "#6fa8ff", line: "大眼睛什麼都找得到" },
+    { t: "m4", img: "mouse", name: "記憶鼠", type: "mouse", color: "#b79cff", line: "把每件事都記在耳朵裡" },
+    { t: "m5", img: "badger", name: "天線獾", type: "antenna", color: "#ffb547", line: "頭上天線收得到所有訊號" },
+    { t: "m6", img: "elephant", name: "老鐵象", type: "elephant", color: "#9db2cc", line: "個子大，心情起伏也大" },
+    { t: "m7", img: "horse", name: "雷角馬", type: "horse", color: "#ff7a8a", line: "閃電角一充飽就暴衝" },
+    { t: "m8", img: "fox", name: "先知狐", type: "fox", color: "#e9ecf5", line: "額頭寶石看得見未來（嗎？）" },
+    { t: "m9", img: "lizard", name: "紅芯蜥", type: "lizard", color: "#e8505b", line: "背上的尖刺是一排排晶片" },
+    { t: "m10", img: "fish", name: "光纖魚", type: "fish", color: "#46d1e6", line: "在光纖裡游得飛快" },
   ];
   const TEMPER = ["", "溫和", "穩穩", "活潑", "暴躁", "超暴衝"];
   const temper = (v) => v < .4 ? 1 : v < .5 ? 2 : v < .65 ? 3 : v < .8 ? 4 : 5;
