@@ -44,6 +44,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; }
 img.art { object-fit: contain; display: block; }
 .slot img.art { width: 60px; height: 60px; }
@@ -122,17 +123,9 @@ button { font: inherit; color: inherit; }
 .step.done { color: var(--ink); }
 .step:disabled { cursor: default; opacity: .6; }
 
-.adult-toggle {
-  display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted);
-  background: none; border: 0; padding: 0; cursor: pointer; align-self: flex-end;
-}
 .switch { width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; transition: background .2s; }
 .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--card); transition: transform .2s; }
-.adult-on .switch { background: var(--grass); }
-.adult-on .switch::after { transform: translateX(14px); }
 
-.adult { display: none; font-size: 12px; color: var(--muted); font-family: var(--font-body); font-weight: 400; }
-.adult-on .adult { display: block; }
 
 .body { padding: 14px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
 .lead { font-family: var(--font-display); font-size: 20px; margin: 0; text-wrap: balance; }
@@ -168,7 +161,6 @@ button { font: inherit; color: inherit; }
 .mon .tm { font-size: 12px; color: var(--muted); white-space: nowrap; }
 .mon .tm i { font-style: normal; color: var(--berry); letter-spacing: -1px; }
 .mon .ln { grid-column: 1 / -1; font-size: 12px; color: var(--muted); margin-top: 4px; }
-.mon .adult { grid-column: 1 / -1; }
 .mon.sel { border-color: var(--sun); box-shadow: 0 0 0 3px var(--sun) inset; }
 .mon.sel::after {
   content: attr(data-slot); position: absolute; top: -8px; right: -6px;
@@ -214,6 +206,7 @@ button { font: inherit; color: inherit; }
 input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; margin: 0; }
 .range-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
 
+.quest .ask { width: 100%; }
 .payout {
   background: var(--sky-2); border-radius: 16px; padding: 12px;
   display: flex; flex-direction: column; gap: 2px; align-items: center; text-align: center;
@@ -336,7 +329,7 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
 <body>
 <div class="page">
   <div class="phone" aria-label="玩家手機畫面原型">
-    <div class="screen adult-on" id="screen">
+    <div class="screen" id="screen">
       <header class="hud">
         <div class="hud-row">
           <span class="pill">第 3 個月 / 6</span>
@@ -344,7 +337,6 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
           <button class="timer" id="timer" title="點一下重新計時">2:00</button>
         </div>
         <nav class="steps" id="steps"></nav>
-        <button class="adult-toggle" id="adultBtn" aria-pressed="true"><span>大人小字</span><span class="switch"></span></button>
       </header>
       <main class="body" id="view"></main>
       <footer class="actions" id="actions"></footer>
@@ -360,10 +352,9 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
     <section>
       <h2>可以試試看</h2>
       <ol class="decide">
-        <li><b>拖「要求的體力」滑桿</b><p>看委託金和「10 次裡會怎樣」一起變化：要求越高，委託金越多，帶回家休養的次數也越多。</p></li>
+        <li><b>拖「要求的體力」滑桿，再按「問公會委託金」</b><p>換幾個要求各問一次：要求越高，委託金越多，「10 次裡會怎樣」裡帶回家休養的次數也越多。</p></li>
         <li><b>回到「組隊」換怪獸</b><p>換一隻脾氣大的，或湊滿 3 隻，再回來看委託金變多少。</p></li>
         <li><b>出發冒險</b><p>結果頁會畫出每隻怪獸一路上的體力，最後列出拿回多少金幣。按「再出發一次」會走另一條路。</p></li>
-        <li><b>右上角「大人小字」</b><p>打開後，會在小朋友用語下方顯示 FCN 正式用語。</p></li>
       </ol>
     </section>
     <p class="fine">這是示意原型。委託金用與正式遊戲相同的公式估算，但路徑數較少，數字會有些微差異。試玩時每次出發都是新的隨機路線；正式遊戲裡全場走同一條路。</p>
@@ -496,7 +487,7 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
   }
 
   // ---------- 狀態 ----------
-  const st = { step: 1, team: [], strike: 80, amount: 100, adult: true, run: null };
+  const st = { step: 1, team: [], strike: 80, amount: 100, run: null, asked: null };
   const $ = (id) => document.getElementById(id);
   const fmt = (x, d = 1) => (Math.round(x * 10 ** d) / 10 ** d).toLocaleString("zh-TW", { minimumFractionDigits: d, maximumFractionDigits: d });
   const wildest = () => st.team.length ? st.team.reduce((a, b) => VOL[MONS[b].t] > VOL[MONS[a].t] ? b : a) : -1;
@@ -507,7 +498,7 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
     const pct = Math.round(v * 100), low = pct < k;
     const cls = low ? "low" : v > 1 ? "over" : "";
     return `<div class="hp-row">${svgOf(m, mood)}
-      <div class="hp-bar" role="img" aria-label="${m.name}體力 ${pct}%，要求 ${k}%">
+      <div class="hp-bar" role="img" aria-label="${m.name}體力 ${pct}，要求 ${k}">
         <div class="hp-fill ${cls}" style="width:${Math.min(100, pct)}%"></div>
         ${showRoom ? `<div class="hp-room" style="left:${k}%"></div>` : ""}
         <div class="hp-mark" style="left:${k}%"></div>
@@ -542,14 +533,13 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
     $("view").innerHTML = `
       <p class="lead">挑最多 3 隻怪獸組成遠征隊</p>
       ${slotsHTML()}
-      <p class="tip">任務結束時，<b>體力最低的那隻</b>決定任務成不成功。脾氣越大，體力起伏越大。<span class="adult">Worst-of：到期由表現最差的標的決定是否接股。脾氣星等 = 年化波動度。</span></p>
+      <p class="tip">任務結束時，<b>體力最低的那隻</b>決定任務成不成功。脾氣越大，體力起伏越大。</p>
       <div class="dex">${MONS.map((m, i) => {
         const at = st.team.indexOf(i), full = st.team.length >= 3 && at < 0, tp = temper(VOL[m.t]);
         return `<button class="mon ${at >= 0 ? "sel" : ""}" data-i="${i}" ${at >= 0 ? `data-slot="${at + 1}"` : ""} ${full ? "disabled" : ""} aria-pressed="${at >= 0}">
           ${svgOf(m)}<span class="nm">${m.name}</span>
           <span class="tm">脾氣 <i>${stars(tp)}</i> ${TEMPER[tp]}</span>
           <span class="ln">${m.line}</span>
-          <span class="adult">波動度 ${Math.round(VOL[m.t] * 100)}%</span>
         </button>`;
       }).join("")}</div>`;
     $("view").querySelectorAll(".mon").forEach((b) => b.onclick = () => {
@@ -573,16 +563,15 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
         <div>
           <input type="range" id="strike" min="50" max="95" step="5" value="${st.strike}" aria-label="要求的體力">
           <div class="range-ends"><span>要求低：簡單，委託金少</span><span>要求高：困難，委託金多</span></div>
-          <span class="adult">要求的體力 = 履約價 K（50%～95%，每格 5%）</span>
         </div>
         <div class="diff"><span>難度 <i id="diffStars"></i> <b id="diffWord"></b></span></div>
+        <button class="btn sun ask" id="ask">問公會委託金</button>
         <div class="payout" aria-live="polite">
-          <span class="big">委託金 每月 <i class="coin"></i><strong class="num" id="perMonth">-</strong> 萬</span>
-          <span class="sub">帶 100 萬出發時；任務失敗也照拿</span>
-          <span class="adult" id="annual"></span>
+          <span class="big">委託金 每月 <i class="coin"></i><strong class="num" id="perMonth">?</strong> 萬</span>
+          <span class="sub" id="paySub"></span>
         </div>
       </div>
-      <div class="odds">
+      <div class="odds" id="odds">
         <h3>接這個任務 10 次，大概會……</h3>
         <div class="bar"><div class="b-ko" id="bKO"></div><div class="b-home" id="bHome"></div><div class="b-stuck" id="bStuck"></div></div>
         <div class="legend">
@@ -590,28 +579,35 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
           <span style="--c:var(--grass)">任務完成 <b class="num" id="nHome"></b> 次</span>
           <span style="--c:var(--berry)">帶回家休養 <b class="num" id="nStuck"></b> 次</span>
         </div>
-        <span class="adult">KO、到期還本、到期接股的機率（風險中性模擬，不是預測）</span>
       </div>
       <div class="why">
         <h3>為什麼公會願意付委託金？</h3>
-        <p>因為你幫公會扛了「怪獸累倒」的風險。任務越可能失敗，委託金越多：</p>
+        <p>因為怪獸有可能累倒，要帶回家照顧。越可能累倒的任務，公會給的委託金越多：</p>
         <ul><li>要求的體力越高</li><li>怪獸脾氣越大</li><li>隊伍越多隻（越可能有一隻撐不住）</li></ul>
       </div>`;
     $("strike").oninput = (e) => { st.strike = +e.target.value; updateQuest(); };
-    updateQuest();
+    $("ask").onclick = () => { st.asked = askKey(); updateQuest(); };
     $("actions").innerHTML = `<button class="btn slim" id="back">上一步</button><button class="btn sun" id="next">接下這個任務</button>`;
     $("back").onclick = () => go(1); $("next").onclick = () => go(3);
+    updateQuest();
   }
+  const askKey = () => st.team.join(",") + "@" + st.strike;
   function updateQuest() {
     const k = st.strike, worried = k >= 90;
-    $("kVal").textContent = k + "%";
+    $("kVal").textContent = k;
     $("hp").innerHTML = st.team.map((i) => hpRow(MONS[i], 1, k, worried ? "worried" : "happy", true)).join("");
     $("roomKey").textContent = `斜線 = 可以掉的體力（${100 - k} 點）`;
     const d = difficulty(k);
     $("diffStars").innerHTML = stars(d); $("diffWord").textContent = DIFF_WORD[d];
+    const asked = st.asked === askKey();
+    $("ask").hidden = asked;
+    $("next").disabled = !asked;
+    $("odds").hidden = !asked;
+    $("paySub").textContent = asked ? "帶 100 萬出發時；任務失敗也照拿"
+      : st.asked ? "改了要求或隊伍，要再問一次公會" : "按上面的按鈕問問公會";
+    if (!asked) { $("perMonth").textContent = "?"; return; }
     const q = quote(st.team, k);
     $("perMonth").textContent = fmt(100 * q.c / 12);
-    $("annual").textContent = `年化票息 ≈ ${fmt(q.c * 100, 2)}%（2 個月期，示意報價）`;
     const n = (p) => p * 10 < .5 && p > 0 ? "不到 1" : fmt(p * 10, 0);
     $("bKO").style.width = q.pKO * 100 + "%"; $("bHome").style.width = q.pHome * 100 + "%"; $("bStuck").style.width = q.pStuck * 100 + "%";
     $("nKO").textContent = n(q.pKO); $("nHome").textContent = n(q.pHome); $("nStuck").textContent = n(q.pStuck);
@@ -623,19 +619,18 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
     $("view").innerHTML = `
       <p class="lead">準備出發！要帶多少金幣？</p>
       <div class="chips">${[25, 50, 75, 100].map((a) => `<button class="chip ${a === st.amount ? "on" : ""}" data-a="${a}"><strong>${a}</strong>${a === 100 ? "全部" : "萬"}</button>`).join("")}</div>
-      <span class="adult">承作金額（每單位 1 萬，最多為現金餘額）</span>
       <div class="summary">
         <div class="team-mini">${st.team.map((k) => svgOf(MONS[k])).join("")}</div>
         <dl class="kv">
           <dt>隊伍</dt><dd>${st.team.map((k) => MONS[k].name).join("、")}</dd>
-          <dt>任務要求</dt><dd>體力 ${st.strike}% 以上・難度 ${DIFF_WORD[difficulty(st.strike)]}<span class="adult">履約價 ${st.strike}%・KO 100%・2 個月期</span></dd>
-          <dt>委託金</dt><dd>每月 <span class="num">+${fmt(coins)}</span> 萬<span class="adult">年化票息 ${fmt(q.c * 100, 2)}%</span></dd>
+          <dt>任務要求</dt><dd>體力 ${st.strike} 以上・難度 ${DIFF_WORD[difficulty(st.strike)]}</dd>
+          <dt>委託金</dt><dd>每月 <span class="num">+${fmt(coins)}</span> 萬</dd>
         </dl>
       </div>
       <ul class="ifs">
-        <li style="--c:var(--gold)">第 1 個月底全隊體力都在 100% 以上：任務提早完成，拿回 ${st.amount} 萬 + 1 個月委託金</li>
-        <li style="--c:var(--grass)">終點那天最弱的也有 ${st.strike}% 以上：任務完成，拿回 ${st.amount} 萬 + 2 個月委託金</li>
-        <li style="--c:var(--berry)">最弱的低於 ${st.strike}%：把牠帶回家休養，身價 = ${st.amount} 萬 × 終點體力 ÷ ${st.strike}%；委託金照拿</li>
+        <li style="--c:var(--gold)">第 1 個月底全隊體力都在 100 以上：任務提早完成，拿回 ${st.amount} 萬 + 1 個月委託金</li>
+        <li style="--c:var(--grass)">終點那天最弱的也有 ${st.strike} 以上：任務完成，拿回 ${st.amount} 萬 + 2 個月委託金</li>
+        <li style="--c:var(--berry)">最弱的低於 ${st.strike}：把牠帶回家休養，牠值的金幣會比帶出去的少；委託金照拿</li>
       </ul>`;
     $("view").querySelectorAll(".chip").forEach((b) => b.onclick = () => { st.amount = +b.dataset.a; viewDepart(); });
     $("actions").innerHTML = `<button class="btn slim" id="camp">在營地休息</button><button class="btn go" id="start">出發冒險！</button>`;
@@ -671,16 +666,16 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
     let kind, title, body, back, backLabel, heroMood;
     if (ko) {
       kind = "gold"; heroMood = "joy"; title = `第 ${ko} 個月就提早完成！`;
-      body = "月底檢查時全隊體力都在 100% 以上，提早回家。";
+      body = "月底檢查時全隊體力都在 100 以上，提早回家。";
       back = st.amount; backLabel = "帶出去的金幣全部拿回";
     } else if (wv >= K) {
       kind = "grass"; heroMood = "joy"; title = "任務完成！";
-      body = `終點檢查：最弱的${wm.name}體力 ${wPct}%，達到要求的 ${st.strike}%。`;
+      body = `終點檢查：最弱的${wm.name}體力 ${wPct}，達到要求的 ${st.strike}。`;
       back = st.amount; backLabel = "帶出去的金幣全部拿回";
     } else {
       kind = "berry"; heroMood = "worried"; title = `${wm.name}累倒了，帶牠回家休養`;
-      body = `終點檢查：${wm.name}體力只剩 ${wPct}%，沒達到要求的 ${st.strike}%。下個月可以決定送走牠，或繼續養著等牠恢復。`;
-      back = st.amount * wv / K; backLabel = `${wm.name}的身價（${st.amount} × ${wPct} ÷ ${st.strike}）`;
+      body = `終點檢查：${wm.name}體力只剩 ${wPct}，沒達到要求的 ${st.strike}。下個月可以決定送走牠，或繼續養著等牠恢復。`;
+      back = st.amount * wv / K; backLabel = `${wm.name}現在值多少金幣`;
     }
     const total = back + coins;
 
@@ -722,9 +717,8 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
           <dt>${backLabel}</dt><dd>${fmt(back)} 萬</dd>
           <dt>委託金 ${months} 個月</dt><dd>+${fmt(coins)} 萬</dd>
           <dt class="sum">帶回家的金幣</dt><dd class="sum">${fmt(total)} 萬</dd>
-          <dt>這次的報酬率</dt><dd>${total >= st.amount ? "+" : ""}${fmt((total / st.amount - 1) * 100)}%</dd>
+          <dt>比帶出去的金幣</dt><dd>${total >= st.amount ? "多" : "少"} ${fmt(Math.abs(total - st.amount))} 萬</dd>
         </dl>
-        <span class="adult">${ko ? `KO：第 ${ko} 個月贖回本金並付 ${ko} 個月票息` : wv >= K ? "到期最差表現 ≥ 履約價：贖回本金並付 2 個月票息" : `到期最差表現 ${wPct}% < 履約價 ${st.strike}%：以履約價接股，持股市值 = 本金 × ${wPct}% ÷ ${st.strike}%；票息照付`}</span>
       </div>
       <p class="note">原型裡每次出發都會走一條新的隨機路；正式遊戲裡全場走同一條路。</p>`;
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -746,7 +740,7 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
         <path d="M60 56 Q72 70 66 82 Q60 88 54 82 Q50 72 60 56 Z" fill="#ffd25a"/>
       </svg>
       <p class="lead">這個月不接任務，在營地休息</p>
-      <p class="tip">金幣不增也不減，下個月再看看公會有什麼委託。<span class="adult">保留現金：本期不承作，資產不變。</span></p>
+      <p class="tip">金幣不增也不減，下個月再看看公會有什麼委託。</p>
     </div>`;
     $("actions").innerHTML = `<button class="btn sun" id="back">改變主意，回去組隊</button>`;
     $("back").onclick = () => go(1);
@@ -757,11 +751,6 @@ input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; mar
     ({ 1: viewTeam, 2: viewQuest, 3: viewDepart, result: viewResult, camp: viewCamp })[st.step]();
   }
 
-  $("adultBtn").onclick = () => {
-    st.adult = !st.adult;
-    $("screen").classList.toggle("adult-on", st.adult);
-    $("adultBtn").setAttribute("aria-pressed", st.adult);
-  };
 
   // 倒數（示意）
   let left = 120;
