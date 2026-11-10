@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>怪獸遠征隊・手機試玩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Huninn&family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<style>
+/* Layout: 桌機左邊一支手機（可操作原型），右邊是給大人看的設計說明；手機寬度時手機框拿掉、說明排到下面。 */
+:root {
+  --sky: #e6f1fb;
+  --sky-2: #d3e6f6;
+  --card: #ffffff;
+  --ink: #1e2147;
+  --muted: #5a6085;
+  --line: #c9d6ea;
+  --sun: #ffc530;
+  --sun-deep: #d99a00;
+  --on-sun: #2b2100;
+  --grass: #23915a;
+  --grass-deep: #17683f;
+  --on-grass: #ffffff;
+  --berry: #e0456a;
+  --berry-soft: rgba(224, 69, 106, .12);
+  --gold: #d29300;
+  --frame: #1e2147;
+  --font-display: "Huninn", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-num: "Baloo 2", "Huninn", ui-rounded, system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sky: #10142e; --sky-2: #182042; --card: #1d2550; --ink: #eef1ff; --muted: #a7aed2; --line: #313a6c;
+    --sun: #ffd25a; --sun-deep: #c79a1c; --on-sun: #2b2100; --grass: #46c98a; --grass-deep: #2a8f5e; --on-grass: #06281a;
+    --berry: #ff6b8a; --berry-soft: rgba(255, 107, 138, .16); --gold: #ffd25a; --frame: #05071a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --sky: #10142e; --sky-2: #182042; --card: #1d2550; --ink: #eef1ff; --muted: #a7aed2; --line: #313a6c;
+  --sun: #ffd25a; --sun-deep: #c79a1c; --on-sun: #2b2100; --grass: #46c98a; --grass-deep: #2a8f5e; --on-grass: #06281a;
+  --berry: #ff6b8a; --berry-soft: rgba(255, 107, 138, .16); --gold: #ffd25a; --frame: #05071a; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+img.art { object-fit: contain; display: block; }
+.slot img.art { width: 60px; height: 60px; }
+.mon img.art { width: 52px; height: 52px; grid-row: span 2; }
+.hp-row img.art { width: 40px; height: 40px; }
+.summary .team-mini img.art { width: 46px; height: 46px; }
+.outcome .hero img.art { width: 110px; height: 110px; }
+.back-link { color: var(--ink); font-family: var(--font-display); }
+body {
+  background: var(--sky);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-block: 32px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  grid-template-columns: 400px minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
+}
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--sun-deep); outline-offset: 2px; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+
+/* ---------- 手機框 ---------- */
+.phone {
+  position: sticky; top: 24px;
+  border: 10px solid var(--frame);
+  border-radius: 44px;
+  background: var(--sky);
+  overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(20, 24, 70, .35);
+}
+.screen { height: 780px; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; scrollbar-width: thin; }
+
+.hud {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--sky);
+  padding: 14px 14px 10px;
+  display: flex; flex-direction: column; gap: 10px;
+  border-bottom: 2px dashed var(--line);
+}
+.hud-row { display: flex; align-items: center; gap: 8px; }
+.pill {
+  font-family: var(--font-display);
+  background: var(--card); border: 2px solid var(--line);
+  border-radius: 999px; padding: 3px 12px; font-size: 14px; white-space: nowrap;
+}
+.wallet { display: inline-flex; align-items: center; gap: 6px; }
+.coin {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff3b0 0 18%, var(--sun) 20% 100%);
+  border: 2px solid var(--sun-deep); flex: none; display: inline-block;
+}
+.timer {
+  margin-left: auto; font-family: var(--font-num); font-weight: 800; font-size: 22px;
+  background: none; border: 0; padding: 0 2px; cursor: pointer; color: var(--ink);
+}
+.timer.hurry { color: var(--berry); animation: wobble .6s ease-in-out infinite; }
+@keyframes wobble { 50% { transform: rotate(-4deg) scale(1.08); } }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.step {
+  font-family: var(--font-display); font-size: 14px; text-align: center;
+  padding: 6px 4px; border-radius: 12px; background: var(--sky-2); color: var(--muted);
+  border: 0; cursor: pointer;
+}
+.step b { font-family: var(--font-num); margin-right: 4px; }
+.step.on { background: var(--ink); color: var(--sky); }
+.step.done { color: var(--ink); }
+.step:disabled { cursor: default; opacity: .6; }
+
+.adult-toggle {
+  display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted);
+  background: none; border: 0; padding: 0; cursor: pointer; align-self: flex-end;
+}
+.switch { width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; transition: background .2s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--card); transition: transform .2s; }
+.adult-on .switch { background: var(--grass); }
+.adult-on .switch::after { transform: translateX(14px); }
+
+.adult { display: none; font-size: 12px; color: var(--muted); font-family: var(--font-body); font-weight: 400; }
+.adult-on .adult { display: block; }
+
+.body { padding: 14px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+.lead { font-family: var(--font-display); font-size: 20px; margin: 0; text-wrap: balance; }
+.tip { margin: 0; font-size: 14px; }
+.tip b { color: var(--berry); font-weight: 700; }
+
+/* 隊伍格 */
+.slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.slot {
+  border: 2.5px dashed var(--line); border-radius: 18px; min-height: 104px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding: 6px; background: transparent; color: var(--muted);
+  font-family: var(--font-display); font-size: 13px; position: relative;
+}
+.slot.filled { border-style: solid; border-color: var(--sun); background: var(--card); color: var(--ink); cursor: pointer; }
+.slot svg { width: 60px; height: 60px; }
+.slot .x { position: absolute; top: 4px; right: 6px; font-size: 13px; color: var(--muted); }
+.slot.weak::before {
+  content: "脾氣最大"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  background: var(--berry); color: #fff; font-size: 11px; padding: 0 8px; border-radius: 999px; white-space: nowrap;
+}
+
+.dex { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mon {
+  background: var(--card); border: 2.5px solid var(--line); border-radius: 18px;
+  padding: 10px; text-align: left; cursor: pointer; position: relative;
+  display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 2px 8px; align-items: center;
+  transition: transform .15s, border-color .15s;
+}
+.mon:hover { transform: translateY(-2px); }
+.mon svg { width: 52px; height: 52px; grid-row: span 2; }
+.mon .nm { font-family: var(--font-display); font-size: 17px; line-height: 1.2; }
+.mon .tm { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.mon .tm i { font-style: normal; color: var(--berry); letter-spacing: -1px; }
+.mon .ln { grid-column: 1 / -1; font-size: 12px; color: var(--muted); margin-top: 4px; }
+.mon .adult { grid-column: 1 / -1; }
+.mon.sel { border-color: var(--sun); box-shadow: 0 0 0 3px var(--sun) inset; }
+.mon.sel::after {
+  content: attr(data-slot); position: absolute; top: -8px; right: -6px;
+  width: 24px; height: 24px; border-radius: 50%; background: var(--sun); color: var(--on-sun);
+  font-family: var(--font-num); font-weight: 800; display: grid; place-items: center; font-size: 14px;
+  border: 2px solid var(--card);
+}
+.mon:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+/* 委託單 */
+.quest {
+  background: var(--card); border: 2.5px solid var(--ink); border-radius: 6px 20px 20px 20px;
+  padding: 18px 14px 14px; display: flex; flex-direction: column; gap: 12px; position: relative; margin-top: 8px;
+}
+.quest .tag {
+  position: absolute; top: -12px; left: 12px; background: var(--ink); color: var(--sky);
+  font-family: var(--font-display); font-size: 13px; padding: 1px 12px; border-radius: 999px;
+}
+.quest .cond { font-family: var(--font-display); font-size: 17px; margin: 0; line-height: 1.4; }
+.quest .cond strong { font-family: var(--font-num); font-size: 28px; color: var(--berry); line-height: 1; }
+.quest .diff { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.quest .diff i { font-style: normal; color: var(--sun-deep); letter-spacing: 1px; }
+
+/* 體力條 */
+.hp { display: flex; flex-direction: column; gap: 10px; }
+.hp-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 8px; align-items: center; }
+.hp-row svg { width: 40px; height: 40px; }
+.hp-bar { position: relative; height: 18px; border-radius: 999px; background: var(--sky-2); }
+.hp-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--grass); transition: width .3s; }
+.hp-fill.low { background: var(--berry); }
+.hp-fill.over { background: linear-gradient(90deg, var(--grass), var(--gold)); }
+.hp-room {
+  position: absolute; top: 0; bottom: 0; right: 0; border-radius: 0 999px 999px 0;
+  background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, .45) 0 4px, transparent 4px 8px);
+}
+.hp-mark { position: absolute; top: -6px; bottom: -6px; width: 4px; border-radius: 2px; background: var(--berry); transform: translateX(-50%); transition: left .2s; }
+.hp-val { font-family: var(--font-num); font-weight: 800; font-size: 17px; text-align: right; }
+.hp-val.low { color: var(--berry); }
+.hp-key { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.hp-key span::before { content: ""; display: inline-block; width: 4px; height: 12px; border-radius: 2px; background: var(--berry); margin-right: 5px; vertical-align: -1px; }
+.hp-key span.room::before { width: 14px; background: repeating-linear-gradient(-45deg, var(--grass) 0 3px, var(--card) 3px 5px); }
+
+input[type="range"] { width: 100%; accent-color: var(--berry); height: 28px; margin: 0; }
+.range-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+
+.payout {
+  background: var(--sky-2); border-radius: 16px; padding: 12px;
+  display: flex; flex-direction: column; gap: 2px; align-items: center; text-align: center;
+}
+.payout .big { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 17px; }
+.payout .big strong { font-family: var(--font-num); font-size: 36px; line-height: 1; }
+.payout .sub { font-size: 13px; color: var(--muted); }
+
+.why { background: var(--card); border-radius: 20px; padding: 14px; border: 2.5px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.why h3, .odds h3 { margin: 0; font-family: var(--font-display); font-size: 15px; font-weight: 400; }
+.why ul { margin: 0; padding-left: 1.2em; font-size: 14px; display: flex; flex-direction: column; gap: 2px; }
+.why p { margin: 0; font-size: 13px; color: var(--muted); }
+
+.odds { background: var(--card); border-radius: 20px; padding: 14px; border: 2.5px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.bar { display: flex; height: 22px; border-radius: 999px; overflow: hidden; background: var(--sky-2); }
+.bar div { transition: width .25s; }
+.b-ko { background: var(--gold); } .b-home { background: var(--grass); } .b-stuck { background: var(--berry); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+
+/* 出發 */
+.summary { background: var(--card); border-radius: 20px; padding: 14px; border: 2.5px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.summary .team-mini { display: flex; gap: 2px; }
+.summary .team-mini svg { width: 46px; height: 46px; }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; font-size: 14px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-family: var(--font-display); }
+.chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.chip {
+  border: 2.5px solid var(--line); background: var(--card); border-radius: 14px; padding: 8px 4px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; font-family: var(--font-display); font-size: 12px; color: var(--muted);
+}
+.chip strong { font-family: var(--font-num); font-size: 22px; color: var(--ink); line-height: 1.1; }
+.chip.on { border-color: var(--sun); background: var(--sun); color: var(--on-sun); }
+.chip.on strong { color: var(--on-sun); }
+.ifs { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.ifs li { display: flex; gap: 8px; align-items: baseline; }
+.ifs li::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; transform: translateY(1px); }
+
+/* 結果 */
+.chart { background: var(--card); border-radius: 20px; border: 2.5px solid var(--line); padding: 8px; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { font-family: var(--font-display); fill: var(--muted); font-size: 11px; }
+.trail { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.trail.run { transition: stroke-dashoffset 1.6s ease-in-out; stroke-dashoffset: 0; }
+.head { opacity: 0; transition: opacity .3s 1.5s; }
+.head.run { opacity: 1; }
+.outcome { border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; background: var(--card); border: 3px solid var(--c); }
+.outcome[hidden] { display: none !important; }
+.outcome h3 { margin: 0; font-family: var(--font-display); font-size: 24px; font-weight: 400; color: var(--c); }
+.outcome p { margin: 0; }
+.outcome .hero svg { width: 96px; height: 96px; }
+.receipt { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 14px; text-align: left; margin: 0; }
+.receipt dt { color: var(--muted); }
+.receipt dd { margin: 0; font-family: var(--font-num); font-weight: 600; text-align: right; }
+.receipt .sum { border-top: 2px dashed var(--line); padding-top: 6px; font-family: var(--font-display); color: var(--ink); }
+.receipt dd.sum { font-weight: 800; font-size: 20px; font-family: var(--font-num); }
+.pop { animation: pop .45s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } }
+.note { font-size: 12px; color: var(--muted); text-align: center; margin: 0; }
+
+.actions {
+  position: sticky; bottom: 0; z-index: 4; background: var(--sky);
+  padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+  display: flex; gap: 10px; border-top: 2px dashed var(--line);
+}
+.btn {
+  flex: 1; border: 0; border-radius: 16px; padding: 13px 12px; cursor: pointer;
+  font-family: var(--font-display); font-size: 17px;
+  background: var(--card); color: var(--ink); box-shadow: 0 4px 0 var(--line);
+  transition: transform .08s, box-shadow .08s;
+}
+.btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--line); }
+.btn.sun { background: var(--sun); color: var(--on-sun); box-shadow: 0 4px 0 var(--sun-deep); }
+.btn.sun:active:not(:disabled) { box-shadow: 0 1px 0 var(--sun-deep); }
+.btn.go { background: var(--grass); color: var(--on-grass); box-shadow: 0 4px 0 var(--grass-deep); flex: 1.5; }
+.btn.go:active:not(:disabled) { box-shadow: 0 1px 0 var(--grass-deep); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.slim { flex: .7; }
+
+.camp { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding-top: 30px; }
+.camp svg.fire { width: 120px; height: 120px; }
+
+/* ---------- 說明欄 ---------- */
+.notes { display: flex; flex-direction: column; gap: 26px; min-width: 0; padding-top: 8px; }
+.notes .eyebrow { font-size: 12px; letter-spacing: .12em; color: var(--muted); margin: 0 0 6px; }
+.notes h1 { font-family: var(--font-display); font-weight: 400; font-size: 40px; line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.notes .intro { max-width: 60ch; margin: 0; color: var(--muted); }
+.map { display: flex; flex-direction: column; border-top: 2px solid var(--ink); }
+.map-row { display: grid; grid-template-columns: 8.5em 7em minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.map-row .kid { font-family: var(--font-display); font-size: 18px; }
+.map-row .fin { font-size: 13px; color: var(--muted); }
+.map-row p { margin: 0; font-size: 14px; }
+.notes h2 { font-family: var(--font-display); font-weight: 400; font-size: 22px; margin: 0 0 10px; }
+.formula { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; max-width: 62ch; }
+.formula p { margin: 0; font-size: 14px; }
+.formula code { font-family: var(--font-display); font-size: 16px; background: var(--sky-2); padding: 2px 8px; border-radius: 8px; }
+.decide { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 10px; max-width: 62ch; }
+.decide li { padding-left: 4px; }
+.decide b { font-family: var(--font-display); font-weight: 400; font-size: 16px; }
+.decide p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.fine { font-size: 13px; color: var(--muted); max-width: 62ch; margin: 0; }
+
+@media (max-width: 880px) {
+  .page { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-block: 0 40px; padding-left: 0; padding-right: 0; }
+  .phone { position: static; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
+  .screen { height: auto; overflow: visible; }
+  .hud, .body, .actions { padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); }
+  .notes { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .notes h1 { font-size: 30px; }
+  .map-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .map-row p { grid-column: 1 / -1; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sky); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="phone" aria-label="玩家手機畫面原型">
+    <div class="screen adult-on" id="screen">
+      <header class="hud">
+        <div class="hud-row">
+          <span class="pill">第 3 個月 / 6</span>
+          <span class="pill wallet"><i class="coin"></i><span class="num" id="wallet">100</span> 萬</span>
+          <button class="timer" id="timer" title="點一下重新計時">2:00</button>
+        </div>
+        <nav class="steps" id="steps"></nav>
+        <button class="adult-toggle" id="adultBtn" aria-pressed="true"><span>大人小字</span><span class="switch"></span></button>
+      </header>
+      <main class="body" id="view"></main>
+      <footer class="actions" id="actions"></footer>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <div>
+      <p class="eyebrow">怪獸遠征隊 · 玩家手機試玩</p>
+      <h1>試玩：接一個任務</h1>
+      <p class="intro">左邊是玩家手機上看到的畫面，可以直接點。打開時已經組好晶殼龜和雷角馬，停在「接任務」這一步。</p>
+    </div>
+    <section>
+      <h2>可以試試看</h2>
+      <ol class="decide">
+        <li><b>拖「要求的體力」滑桿</b><p>看委託金和「10 次裡會怎樣」一起變化：要求越高，委託金越多，帶回家休養的次數也越多。</p></li>
+        <li><b>回到「組隊」換怪獸</b><p>換一隻脾氣大的，或湊滿 3 隻，再回來看委託金變多少。</p></li>
+        <li><b>出發冒險</b><p>結果頁會畫出每隻怪獸一路上的體力，最後列出拿回多少金幣。按「再出發一次」會走另一條路。</p></li>
+        <li><b>右上角「大人小字」</b><p>打開後，會在小朋友用語下方顯示 FCN 正式用語。</p></li>
+      </ol>
+    </section>
+    <p class="fine">這是示意原型：除了晶殼龜，其他怪獸是暫時的簡圖，正式插畫製作中。委託金用與正式遊戲相同的公式估算，但路徑數較少，數字會有些微差異。試玩時每次出發都是新的隨機路線；正式遊戲裡全場走同一條路。</p>
+    <p><a class="back-link" href="./">← 回到遊戲說明</a></p>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const VOL = { m1: .41733, m2: .380935, m3: .332163, m4: .832806, m5: .477661, m6: .855489, m7: .461249, m8: .58868, m9: .721912, m10: .839613 };
+  const MONS = [
+    { t: "m1", img: "turtle", name: "晶殼龜", type: "shell", color: "#4cc9a6", line: "背上的晶片殼越長越厚" },
+    { t: "m2", name: "綠光豹", type: "leopard", color: "#8bd346", line: "跑起來會發出綠光" },
+    { t: "m3", name: "搜尋鴞", type: "owl", color: "#6fa8ff", line: "大眼睛什麼都找得到" },
+    { t: "m4", name: "記憶鼠", type: "mouse", color: "#b79cff", line: "把每件事都記在耳朵裡" },
+    { t: "m5", name: "天線獾", type: "antenna", color: "#ffb547", line: "頭上天線收得到所有訊號" },
+    { t: "m6", name: "老鐵象", type: "elephant", color: "#9db2cc", line: "個子大，心情起伏也大" },
+    { t: "m7", name: "雷角馬", type: "horse", color: "#ff7a8a", line: "閃電角一充飽就暴衝" },
+    { t: "m8", name: "先知狐", type: "fox", color: "#e9ecf5", line: "額頭寶石看得見未來（嗎？）" },
+    { t: "m9", name: "紅芯蜥", type: "lizard", color: "#e8505b", line: "背上的尖刺是一排排晶片" },
+    { t: "m10", name: "光纖魚", type: "fish", color: "#46d1e6", line: "在光纖裡游得飛快" },
+  ];
+  const TEMPER = ["", "溫和", "穩穩", "活潑", "暴躁", "超暴衝"];
+  const temper = (v) => v < .4 ? 1 : v < .5 ? 2 : v < .65 ? 3 : v < .8 ? 4 : 5;
+  const difficulty = (k) => Math.min(5, Math.max(1, Math.ceil((k - 45) / 10)));
+  const DIFF_WORD = ["", "輕鬆", "簡單", "普通", "困難", "超困難"];
+  const OUT = "#2a2440";
+
+  // ---------- 怪獸繪製（占位，正式版換成 3D 渲染圖） ----------
+  function shade(hex, f) {
+    const n = parseInt(hex.slice(1), 16);
+    const r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    const m = (c) => Math.round(f >= 0 ? c + (255 - c) * f : c * (1 + f));
+    return `rgb(${m(r)},${m(g)},${m(b)})`;
+  }
+  function creature(m, mood = "happy") {
+    const c = m.color, dk = shade(c, -.28), lt = shade(c, .5);
+    const s = `stroke="${OUT}" stroke-width="3" stroke-linejoin="round"`;
+    let back = "", front = "";
+    switch (m.type) {
+      case "shell":
+        back = `<path d="M18 60 Q50 6 82 60 Z" fill="${dk}" ${s}/><path d="M38 30 L50 22 L62 30 L62 42 L50 48 L38 42 Z" fill="none" stroke="${lt}" stroke-width="2.5"/><path d="M26 46 L38 42 M74 46 L62 42 M50 22 L50 12" stroke="${lt}" stroke-width="2.5"/>`;
+        break;
+      case "leopard":
+        back = `<path d="M26 44 L28 16 L46 34 Z M74 44 L72 16 L54 34 Z" fill="${c}" ${s}/>`;
+        front = `<circle cx="28" cy="58" r="3" fill="${dk}"/><circle cx="73" cy="56" r="3.5" fill="${dk}"/><circle cx="31" cy="72" r="2.5" fill="${dk}"/><circle cx="70" cy="72" r="2.5" fill="${dk}"/>`;
+        break;
+      case "owl":
+        back = `<path d="M28 40 L22 16 L42 32 Z M72 40 L78 16 L58 32 Z" fill="${dk}" ${s}/>`;
+        front = `<circle cx="39" cy="53" r="12" fill="${lt}" stroke="${OUT}" stroke-width="2.5"/><circle cx="61" cy="53" r="12" fill="${lt}" stroke="${OUT}" stroke-width="2.5"/><path d="M46 62 L54 62 L50 69 Z" fill="#ffb547" ${s}/>`;
+        break;
+      case "mouse":
+        back = `<circle cx="25" cy="32" r="15" fill="${c}" ${s}/><circle cx="75" cy="32" r="15" fill="${c}" ${s}/><circle cx="25" cy="32" r="8" fill="#ff9fb4"/><circle cx="75" cy="32" r="8" fill="#ff9fb4"/>`;
+        front = `<path d="M20 64 L32 66 M20 72 L32 69 M80 64 L68 66 M80 72 L68 69" stroke="${OUT}" stroke-width="2" stroke-linecap="round"/>`;
+        break;
+      case "antenna":
+        back = `<path d="M50 34 L50 12" ${s}/><circle cx="50" cy="10" r="6" fill="#ff7a8a" ${s}/><path d="M38 8 Q34 14 38 20 M62 8 Q66 14 62 20" fill="none" stroke="${OUT}" stroke-width="2.5" stroke-linecap="round"/><path d="M27 40 L30 26 L40 34 Z M73 40 L70 26 L60 34 Z" fill="${c}" ${s}/>`;
+        front = `<path d="M34 40 Q50 50 66 40" fill="none" stroke="${dk}" stroke-width="5" stroke-linecap="round"/>`;
+        break;
+      case "elephant":
+        back = `<ellipse cx="20" cy="56" rx="15" ry="20" fill="${c}" ${s}/><ellipse cx="80" cy="56" rx="15" ry="20" fill="${c}" ${s}/><ellipse cx="20" cy="56" rx="8" ry="12" fill="#ffb6c6"/><ellipse cx="80" cy="56" rx="8" ry="12" fill="#ffb6c6"/>`;
+        front = `<path d="M50 60 Q47 80 56 88 Q62 90 60 84" fill="none" stroke="${OUT}" stroke-width="11" stroke-linecap="round"/><path d="M50 60 Q47 80 56 88 Q62 90 60 84" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`;
+        break;
+      case "horse":
+        back = `<path d="M53 4 L41 28 L49 28 L43 42 L62 20 L53 20 L60 4 Z" fill="#ffd25a" ${s}/><path d="M28 42 L28 24 L40 34 Z M72 42 L72 24 L60 34 Z" fill="${c}" ${s}/>`;
+        break;
+      case "fox":
+        back = `<path d="M24 46 L22 10 L46 32 Z M76 46 L78 10 L54 32 Z" fill="${c}" ${s}/><path d="M27 38 L26 20 L38 32 Z M73 38 L74 20 L62 32 Z" fill="#ffb6c6"/>`;
+        front = `<path d="M50 36 L55 42 L50 48 L45 42 Z" fill="#6fe3ff" ${s}/>`;
+        break;
+      case "lizard":
+        back = `<path d="M24 46 L30 22 L40 36 L50 14 L60 36 L70 22 L76 46 Z" fill="#ffd25a" ${s}/>`;
+        front = `<rect x="27" y="68" width="7" height="7" rx="1.5" fill="${dk}"/><rect x="66" y="68" width="7" height="7" rx="1.5" fill="${dk}"/>`;
+        break;
+      case "fish":
+        back = `<path d="M22 60 L4 46 L8 72 Z M78 60 L96 46 L92 72 Z" fill="${dk}" ${s}/><path d="M38 36 Q50 8 64 36 Z" fill="${dk}" ${s}/>`;
+        front = `<path d="M30 74 Q34 70 38 74 M62 74 Q66 70 70 74" fill="none" stroke="${dk}" stroke-width="2.5" stroke-linecap="round"/>`;
+        break;
+    }
+    const big = m.type === "owl";
+    const er = big ? 6 : 7;
+    const eyes = mood === "joy"
+      ? `<path d="M34 54 Q40 46 46 54 M54 54 Q60 46 66 54" fill="none" stroke="${OUT}" stroke-width="3.5" stroke-linecap="round"/>`
+      : `<circle cx="${big ? 39 : 40}" cy="53" r="${er}" fill="#fff" stroke="${OUT}" stroke-width="2.5"/><circle cx="${big ? 61 : 60}" cy="53" r="${er}" fill="#fff" stroke="${OUT}" stroke-width="2.5"/>
+         <circle cx="${big ? 40 : 41}" cy="${mood === "worried" ? 55 : 54}" r="3.6" fill="${OUT}"/><circle cx="${big ? 62 : 61}" cy="${mood === "worried" ? 55 : 54}" r="3.6" fill="${OUT}"/>
+         <circle cx="${big ? 41.5 : 42.5}" cy="52" r="1.3" fill="#fff"/><circle cx="${big ? 63.5 : 62.5}" cy="52" r="1.3" fill="#fff"/>`;
+    const brows = mood === "worried" ? `<path d="M33 42 L45 45 M67 42 L55 45" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>` : "";
+    const mouth = m.type === "elephant" || m.type === "owl" ? "" :
+      mood === "worried" ? `<path d="M44 71 Q50 66 56 71" fill="none" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>` :
+      mood === "joy" ? `<path d="M43 65 Q50 76 57 65 Z" fill="#ff7a8a" ${s}/>` :
+      `<path d="M44 66 Q50 72 56 66" fill="none" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>`;
+    const sweat = mood === "worried" ? `<path d="M76 40 Q72 47 76 49 Q80 47 76 40 Z" fill="#9fdcff" stroke="${OUT}" stroke-width="1.5"/>` : "";
+    return `${back}<ellipse cx="50" cy="61" rx="31" ry="28" fill="${c}" ${s}/><ellipse cx="50" cy="71" rx="17" ry="13" fill="${lt}"/>${front}
+      <ellipse cx="31" cy="64" rx="4.5" ry="2.8" fill="#ff8fa3" opacity=".75"/><ellipse cx="69" cy="64" rx="4.5" ry="2.8" fill="#ff8fa3" opacity=".75"/>${eyes}${brows}${mouth}${sweat}`;
+  }
+  const svgOf = (m, mood = "happy") => m.img ? `<img class="art" src="img/${m.img}_${mood}.webp" alt="">` : `<svg viewBox="0 0 100 100" aria-hidden="true">${creature(m, mood)}</svg>`;
+
+  // ---------- 報價（與 fcngame/pricing.py 同一套公式，路徑數較少） ----------
+  function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function gauss(rand) { let spare = null; return () => { if (spare !== null) { const v = spare; spare = null; return v; } let u, v, s; do { u = rand() * 2 - 1; v = rand() * 2 - 1; s = u * u + v * v; } while (s >= 1 || s === 0); const k = Math.sqrt(-2 * Math.log(s) / s); spare = v * k; return u * k; }; }
+  const PATHS = 8000, TENOR = 2, NT = MONS.length, DT = 1 / 12;
+  const Z = new Float64Array(PATHS * TENOR * NT);
+  { const g = gauss(mulberry32(20261110)); for (let i = 0; i < Z.length; i++) Z[i] = g(); }
+  const cache = new Map();
+  function quote(team, strikePct) {
+    const key = [...team].sort((a, b) => a - b).join(",") + "@" + strikePct;
+    if (cache.has(key)) return cache.get(key);
+    const K = strikePct / 100;
+    const sig = team.map((i) => VOL[MONS[i].t]);
+    let A = 0, B = 0, ko = 0, stuck = 0;
+    const lg = new Float64Array(team.length);
+    for (let p = 0; p < PATHS; p++) {
+      lg.fill(0);
+      for (let m = 0; m < TENOR; m++) {
+        let worst = Infinity;
+        for (let j = 0; j < team.length; j++) {
+          lg[j] += -.5 * sig[j] * sig[j] * DT + sig[j] * Math.sqrt(DT) * Z[(p * TENOR + m) * NT + team[j]];
+          const w = Math.exp(lg[j]); if (w < worst) worst = w;
+        }
+        A += 1;                                   // 本月仍存續 → 付委託金
+        if (worst >= 1) { B += 1; ko++; break; }  // 提早完成（KO）
+        if (m === TENOR - 1) { if (worst >= K) B += 1; else { B += worst / K; stuck++; } }
+      }
+    }
+    A /= PATHS; B /= PATHS;
+    const q = { c: Math.max(0, 12 * (1 - B) / A), pKO: ko / PATHS, pStuck: stuck / PATHS };
+    q.pHome = Math.max(0, 1 - q.pKO - q.pStuck);
+    cache.set(key, q);
+    return q;
+  }
+
+  // ---------- 狀態 ----------
+  const st = { step: 1, team: [], strike: 80, amount: 100, adult: true, run: null };
+  const $ = (id) => document.getElementById(id);
+  const fmt = (x, d = 1) => (Math.round(x * 10 ** d) / 10 ** d).toLocaleString("zh-TW", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const wildest = () => st.team.length ? st.team.reduce((a, b) => VOL[MONS[b].t] > VOL[MONS[a].t] ? b : a) : -1;
+  const stars = (n) => "★".repeat(n) + `<span style="opacity:.3">${"★".repeat(5 - n)}</span>`;
+
+  // 體力條：v = 體力（1 = 100%），k = 要求（%）
+  function hpRow(m, v, k, mood, showRoom) {
+    const pct = Math.round(v * 100), low = pct < k;
+    const cls = low ? "low" : v > 1 ? "over" : "";
+    return `<div class="hp-row">${svgOf(m, mood)}
+      <div class="hp-bar" role="img" aria-label="${m.name}體力 ${pct}%，要求 ${k}%">
+        <div class="hp-fill ${cls}" style="width:${Math.min(100, pct)}%"></div>
+        ${showRoom ? `<div class="hp-room" style="left:${k}%"></div>` : ""}
+        <div class="hp-mark" style="left:${k}%"></div>
+      </div>
+      <span class="hp-val ${low ? "low" : ""}">${pct}</span></div>`;
+  }
+
+  function go(step) { st.step = step; render(); $("screen").scrollTop = 0; if (window.innerWidth <= 880) $("screen").scrollIntoView({ block: "start" }); }
+
+  function renderSteps() {
+    const names = ["組隊", "接任務", "出發"];
+    const cur = typeof st.step === "number" ? st.step : 4;
+    $("steps").innerHTML = names.map((n, i) => {
+      const k = i + 1;
+      const can = k === 1 || st.team.length > 0;
+      return `<button class="step ${k === cur ? "on" : k < cur ? "done" : ""}" data-k="${k}" ${can && cur !== 4 ? "" : "disabled"}><b>${k}</b>${n}</button>`;
+    }).join("");
+    $("steps").querySelectorAll("button").forEach((b) => b.onclick = () => go(+b.dataset.k));
+  }
+
+  function slotsHTML() {
+    const w = wildest();
+    return `<div class="slots">${[0, 1, 2].map((i) => {
+      const k = st.team[i];
+      if (k === undefined) return `<div class="slot">空位</div>`;
+      const m = MONS[k];
+      return `<button class="slot filled ${st.team.length > 1 && k === w ? "weak" : ""}" data-rm="${k}" aria-label="把${m.name}移出隊伍"><span class="x">✕</span>${svgOf(m)}${m.name}</button>`;
+    }).join("")}</div>`;
+  }
+
+  function viewTeam() {
+    $("view").innerHTML = `
+      <p class="lead">挑最多 3 隻怪獸組成遠征隊</p>
+      ${slotsHTML()}
+      <p class="tip">任務結束時，<b>體力最低的那隻</b>決定任務成不成功。脾氣越大，體力起伏越大。<span class="adult">Worst-of：到期由表現最差的標的決定是否接股。脾氣星等 = 年化波動度。</span></p>
+      <div class="dex">${MONS.map((m, i) => {
+        const at = st.team.indexOf(i), full = st.team.length >= 3 && at < 0, tp = temper(VOL[m.t]);
+        return `<button class="mon ${at >= 0 ? "sel" : ""}" data-i="${i}" ${at >= 0 ? `data-slot="${at + 1}"` : ""} ${full ? "disabled" : ""} aria-pressed="${at >= 0}">
+          ${svgOf(m)}<span class="nm">${m.name}</span>
+          <span class="tm">脾氣 <i>${stars(tp)}</i> ${TEMPER[tp]}</span>
+          <span class="ln">${m.line}</span>
+          <span class="adult">波動度 ${Math.round(VOL[m.t] * 100)}%</span>
+        </button>`;
+      }).join("")}</div>`;
+    $("view").querySelectorAll(".mon").forEach((b) => b.onclick = () => {
+      const i = +b.dataset.i, at = st.team.indexOf(i);
+      if (at >= 0) st.team.splice(at, 1); else if (st.team.length < 3) st.team.push(i);
+      render();
+    });
+    $("view").querySelectorAll("[data-rm]").forEach((b) => b.onclick = () => { st.team.splice(st.team.indexOf(+b.dataset.rm), 1); render(); });
+    $("actions").innerHTML = `<button class="btn sun" id="next" ${st.team.length ? "" : "disabled"}>${st.team.length ? "下一步：接任務" : "先挑一隻怪獸"}</button>`;
+    $("next").onclick = () => go(2);
+  }
+
+  function viewQuest() {
+    $("view").innerHTML = `
+      <p class="lead">公會的委託：你敢接多難的？</p>
+      <div class="quest">
+        <span class="tag">委託單</span>
+        <p class="cond">任務結束那天，每隻怪獸的體力都要在 <strong class="num" id="kVal"></strong> 以上</p>
+        <div class="hp" id="hp"></div>
+        <div class="hp-key"><span>任務要求</span><span class="room" id="roomKey"></span></div>
+        <div>
+          <input type="range" id="strike" min="50" max="95" step="5" value="${st.strike}" aria-label="要求的體力">
+          <div class="range-ends"><span>要求低：簡單，委託金少</span><span>要求高：困難，委託金多</span></div>
+          <span class="adult">要求的體力 = 履約價 K（50%～95%，每格 5%）</span>
+        </div>
+        <div class="diff"><span>難度 <i id="diffStars"></i> <b id="diffWord"></b></span></div>
+        <div class="payout" aria-live="polite">
+          <span class="big">委託金 每月 <i class="coin"></i><strong class="num" id="perMonth">-</strong> 萬</span>
+          <span class="sub">帶 100 萬出發時；任務失敗也照拿</span>
+          <span class="adult" id="annual"></span>
+        </div>
+      </div>
+      <div class="odds">
+        <h3>接這個任務 10 次，大概會……</h3>
+        <div class="bar"><div class="b-ko" id="bKO"></div><div class="b-home" id="bHome"></div><div class="b-stuck" id="bStuck"></div></div>
+        <div class="legend">
+          <span style="--c:var(--gold)">提早完成 <b class="num" id="nKO"></b> 次</span>
+          <span style="--c:var(--grass)">任務完成 <b class="num" id="nHome"></b> 次</span>
+          <span style="--c:var(--berry)">帶回家休養 <b class="num" id="nStuck"></b> 次</span>
+        </div>
+        <span class="adult">KO、到期還本、到期接股的機率（風險中性模擬，不是預測）</span>
+      </div>
+      <div class="why">
+        <h3>為什麼公會願意付委託金？</h3>
+        <p>因為你幫公會扛了「怪獸累倒」的風險。任務越可能失敗，委託金越多：</p>
+        <ul><li>要求的體力越高</li><li>怪獸脾氣越大</li><li>隊伍越多隻（越可能有一隻撐不住）</li></ul>
+      </div>`;
+    $("strike").oninput = (e) => { st.strike = +e.target.value; updateQuest(); };
+    updateQuest();
+    $("actions").innerHTML = `<button class="btn slim" id="back">上一步</button><button class="btn sun" id="next">接下這個任務</button>`;
+    $("back").onclick = () => go(1); $("next").onclick = () => go(3);
+  }
+  function updateQuest() {
+    const k = st.strike, worried = k >= 90;
+    $("kVal").textContent = k + "%";
+    $("hp").innerHTML = st.team.map((i) => hpRow(MONS[i], 1, k, worried ? "worried" : "happy", true)).join("");
+    $("roomKey").textContent = `斜線 = 可以掉的體力（${100 - k} 點）`;
+    const d = difficulty(k);
+    $("diffStars").innerHTML = stars(d); $("diffWord").textContent = DIFF_WORD[d];
+    const q = quote(st.team, k);
+    $("perMonth").textContent = fmt(100 * q.c / 12);
+    $("annual").textContent = `年化票息 ≈ ${fmt(q.c * 100, 2)}%（2 個月期，示意報價）`;
+    const n = (p) => p * 10 < .5 && p > 0 ? "不到 1" : fmt(p * 10, 0);
+    $("bKO").style.width = q.pKO * 100 + "%"; $("bHome").style.width = q.pHome * 100 + "%"; $("bStuck").style.width = q.pStuck * 100 + "%";
+    $("nKO").textContent = n(q.pKO); $("nHome").textContent = n(q.pHome); $("nStuck").textContent = n(q.pStuck);
+  }
+
+  function viewDepart() {
+    const q = quote(st.team, st.strike);
+    const coins = st.amount * q.c / 12;
+    $("view").innerHTML = `
+      <p class="lead">準備出發！要帶多少金幣？</p>
+      <div class="chips">${[25, 50, 75, 100].map((a) => `<button class="chip ${a === st.amount ? "on" : ""}" data-a="${a}"><strong>${a}</strong>${a === 100 ? "全部" : "萬"}</button>`).join("")}</div>
+      <span class="adult">承作金額（每單位 1 萬，最多為現金餘額）</span>
+      <div class="summary">
+        <div class="team-mini">${st.team.map((k) => svgOf(MONS[k])).join("")}</div>
+        <dl class="kv">
+          <dt>隊伍</dt><dd>${st.team.map((k) => MONS[k].name).join("、")}</dd>
+          <dt>任務要求</dt><dd>體力 ${st.strike}% 以上・難度 ${DIFF_WORD[difficulty(st.strike)]}<span class="adult">履約價 ${st.strike}%・KO 100%・2 個月期</span></dd>
+          <dt>委託金</dt><dd>每月 <span class="num">+${fmt(coins)}</span> 萬<span class="adult">年化票息 ${fmt(q.c * 100, 2)}%</span></dd>
+        </dl>
+      </div>
+      <ul class="ifs">
+        <li style="--c:var(--gold)">第 1 個月底全隊體力都在 100% 以上：任務提早完成，拿回 ${st.amount} 萬 + 1 個月委託金</li>
+        <li style="--c:var(--grass)">終點那天最弱的也有 ${st.strike}% 以上：任務完成，拿回 ${st.amount} 萬 + 2 個月委託金</li>
+        <li style="--c:var(--berry)">最弱的低於 ${st.strike}%：把牠帶回家休養，身價 = ${st.amount} 萬 × 終點體力 ÷ ${st.strike}%；委託金照拿</li>
+      </ul>`;
+    $("view").querySelectorAll(".chip").forEach((b) => b.onclick = () => { st.amount = +b.dataset.a; viewDepart(); });
+    $("actions").innerHTML = `<button class="btn slim" id="camp">在營地休息</button><button class="btn go" id="start">出發冒險！</button>`;
+    $("camp").onclick = () => go("camp");
+    $("start").onclick = () => { st.run = adventure(); go("result"); };
+  }
+
+  // 一條隨機的冒險路（只是示意；正式遊戲全場同一條路）
+  function adventure() {
+    const g = gauss(Math.random);
+    const lg = st.team.map(() => 0), pts = st.team.map(() => [1]);
+    let ko = 0;
+    for (let m = 0; m < TENOR; m++) {
+      let worst = Infinity;
+      st.team.forEach((k, j) => {
+        const s = VOL[MONS[k].t];
+        lg[j] += -.5 * s * s * DT + s * Math.sqrt(DT) * g();
+        const v = Math.exp(lg[j]); pts[j].push(v); worst = Math.min(worst, v);
+      });
+      if (worst >= 1) { ko = m + 1; break; }
+    }
+    return { pts, ko };
+  }
+
+  function viewResult() {
+    const { pts, ko } = st.run;
+    const q = quote(st.team, st.strike), K = st.strike / 100;
+    const months = ko || TENOR;
+    const finals = pts.map((p) => p[p.length - 1]);
+    const wj = finals.indexOf(Math.min(...finals)), wm = MONS[st.team[wj]], wv = finals[wj];
+    const coins = st.amount * q.c / 12 * months;
+    const wPct = Math.round(wv * 100);
+    let kind, title, body, back, backLabel, heroMood;
+    if (ko) {
+      kind = "gold"; heroMood = "joy"; title = `第 ${ko} 個月就提早完成！`;
+      body = "月底檢查時全隊體力都在 100% 以上，提早回家。";
+      back = st.amount; backLabel = "帶出去的金幣全部拿回";
+    } else if (wv >= K) {
+      kind = "grass"; heroMood = "joy"; title = "任務完成！";
+      body = `終點檢查：最弱的${wm.name}體力 ${wPct}%，達到要求的 ${st.strike}%。`;
+      back = st.amount; backLabel = "帶出去的金幣全部拿回";
+    } else {
+      kind = "berry"; heroMood = "worried"; title = `${wm.name}累倒了，帶牠回家休養`;
+      body = `終點檢查：${wm.name}體力只剩 ${wPct}%，沒達到要求的 ${st.strike}%。下個月可以決定送走牠，或繼續養著等牠恢復。`;
+      back = st.amount * wv / K; backLabel = `${wm.name}的身價（${st.amount} × ${wPct} ÷ ${st.strike}）`;
+    }
+    const total = back + coins;
+
+    // 圖：x = 月份，y = 體力
+    const W = 320, H = 210, L = 40, R = 46, T = 22, Bm = 28;
+    const all = pts.flat();
+    const lo = Math.min(K, ...all) - .06, hi = Math.max(1.08, ...all) + .05;
+    const x = (m) => L + m / TENOR * (W - L - R), y = (v) => T + (hi - v) / (hi - lo) * (H - T - Bm);
+    const xl = ["出發", "第 1 月底", "終點"];
+    const grid = [0, 1, 2].map((m) => `<line x1="${x(m)}" x2="${x(m)}" y1="${T}" y2="${H - Bm}" stroke="var(--line)" stroke-width="${m === 2 ? 2.5 : 1}" ${m === 2 ? 'stroke-dasharray="4 3"' : ""}/><text x="${x(m)}" y="${H - 8}" text-anchor="middle">${xl[m]}</text>`).join("");
+    const lines = `<rect x="${L}" y="${y(K)}" width="${W - L - R}" height="${H - Bm - y(K)}" fill="var(--berry-soft)"/>
+      <line x1="${L}" x2="${W - R}" y1="${y(1)}" y2="${y(1)}" stroke="var(--gold)" stroke-width="2" stroke-dasharray="3 4"/>
+      <text x="${L - 6}" y="${y(1) + 4}" text-anchor="end" style="fill:var(--gold)">100</text>
+      <line x1="${L}" x2="${W - R}" y1="${y(K)}" y2="${y(K)}" stroke="var(--berry)" stroke-width="2.5"/>
+      <text x="${L - 6}" y="${y(K) + 4}" text-anchor="end" style="fill:var(--berry)">${st.strike}</text>
+      <text x="${x(2)}" y="${T - 8}" text-anchor="middle">終點檢查</text>
+      <text x="${L}" y="${T - 8}">體力</text>`;
+    const trails = pts.map((p, j) => {
+      const d = p.map((v, m) => `${x(m)},${y(v)}`).join(" ");
+      return `<polyline class="trail" pathLength="1" points="${d}" stroke="${shade(MONS[st.team[j]].color, -.15)}"/>`;
+    }).join("");
+    const moodOf = (v) => ko ? "joy" : v < K ? "worried" : "happy";
+    const heads = pts.map((p, j) => {
+      const v = p[p.length - 1], m = p.length - 1;
+      const mon = MONS[st.team[j]], hx = x(m) - 17, hy = y(v) - 30 - j * 2;
+      return mon.img ? `<image class="head" href="img/${mon.img}_${moodOf(v)}.webp" x="${hx}" y="${hy}" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>`
+        : `<svg class="head" x="${hx}" y="${hy}" width="34" height="34" viewBox="0 0 100 100">${creature(mon, moodOf(v))}</svg>`;
+    }).join("");
+    const c = `var(--${kind})`;
+    $("view").innerHTML = `
+      <p class="lead">遠征隊回來了</p>
+      <div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="每隻怪獸一路上的體力">${grid}${lines}${trails}${heads}</svg></div>
+      <div class="hp">${pts.map((p, j) => hpRow(MONS[st.team[j]], p[p.length - 1], st.strike, moodOf(p[p.length - 1]), false)).join("")}</div>
+      <div class="outcome" id="outcome" style="--c:${c}" hidden>
+        <div class="hero">${svgOf(ko ? MONS[st.team[0]] : wm, heroMood)}</div>
+        <h3>${title}</h3>
+        <p>${body}</p>
+        <dl class="receipt">
+          <dt>${backLabel}</dt><dd>${fmt(back)} 萬</dd>
+          <dt>委託金 ${months} 個月</dt><dd>+${fmt(coins)} 萬</dd>
+          <dt class="sum">帶回家的金幣</dt><dd class="sum">${fmt(total)} 萬</dd>
+          <dt>這次的報酬率</dt><dd>${total >= st.amount ? "+" : ""}${fmt((total / st.amount - 1) * 100)}%</dd>
+        </dl>
+        <span class="adult">${ko ? `KO：第 ${ko} 個月贖回本金並付 ${ko} 個月票息` : wv >= K ? "到期最差表現 ≥ 履約價：贖回本金並付 2 個月票息" : `到期最差表現 ${wPct}% < 履約價 ${st.strike}%：以履約價接股，持股市值 = 本金 × ${wPct}% ÷ ${st.strike}%；票息照付`}</span>
+      </div>
+      <p class="note">原型裡每次出發都會走一條新的隨機路；正式遊戲裡全場走同一條路。</p>`;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      $("view").querySelectorAll(".trail, .head").forEach((el) => el.classList.add("run"));
+    }));
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(() => { const o = $("outcome"); if (o) { o.hidden = false; o.classList.add("pop"); } }, reduce ? 0 : 1700);
+    $("wallet").textContent = fmt(100 - st.amount + total, 0);
+    $("actions").innerHTML = `<button class="btn slim" id="again">重新組隊</button><button class="btn go" id="retry">再出發一次</button>`;
+    $("again").onclick = () => { $("wallet").textContent = "100"; go(1); };
+    $("retry").onclick = () => { st.run = adventure(); go("result"); };
+  }
+
+  function viewCamp() {
+    $("view").innerHTML = `<div class="camp">
+      <svg class="fire" viewBox="0 0 120 120" aria-hidden="true">
+        <path d="M30 98 L90 86 M30 86 L90 98" stroke="#8a5a3b" stroke-width="9" stroke-linecap="round"/>
+        <path d="M60 22 Q84 52 76 74 Q70 90 60 90 Q50 90 44 74 Q38 56 52 44 Q52 58 60 60 Q66 44 60 22 Z" fill="#ff8a3d" stroke="${OUT}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M60 56 Q72 70 66 82 Q60 88 54 82 Q50 72 60 56 Z" fill="#ffd25a"/>
+      </svg>
+      <p class="lead">這個月不接任務，在營地休息</p>
+      <p class="tip">金幣不增也不減，下個月再看看公會有什麼委託。<span class="adult">保留現金：本期不承作，資產不變。</span></p>
+    </div>`;
+    $("actions").innerHTML = `<button class="btn sun" id="back">改變主意，回去組隊</button>`;
+    $("back").onclick = () => go(1);
+  }
+
+  function render() {
+    renderSteps();
+    ({ 1: viewTeam, 2: viewQuest, 3: viewDepart, result: viewResult, camp: viewCamp })[st.step]();
+  }
+
+  $("adultBtn").onclick = () => {
+    st.adult = !st.adult;
+    $("screen").classList.toggle("adult-on", st.adult);
+    $("adultBtn").setAttribute("aria-pressed", st.adult);
+  };
+
+  // 倒數（示意）
+  let left = 120;
+  const tick = () => {
+    left = Math.max(0, left - 1);
+    const t = $("timer");
+    t.textContent = left ? `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}` : "時間到";
+    t.classList.toggle("hurry", left > 0 && left <= 10);
+  };
+  setInterval(tick, 1000);
+  $("timer").onclick = () => { left = 121; tick(); };
+
+  // 開場：預先放兩隻怪獸，並停在「接任務」這一步
+  st.team = [0, 6];
+  st.step = 2;
+  render();
+})();
+</script>
+</body>
+</html>

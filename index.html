@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>怪獸遠征隊・主持人說明</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Huninn&family=Noto+Sans+TC:wght@400;700&display=swap">
+<style>
+/* Layout: 單欄說明頁，開頭是角色登場，接著依「世界觀 → 一個月的流程 → 接任務 → 結果 → 金幣怎麼算 → 主持人口條」往下讀。 */
+:root {
+  --sky: #e6f1fb;
+  --sky-2: #d3e6f6;
+  --card: #ffffff;
+  --ink: #1e2147;
+  --muted: #5a6085;
+  --line: #c9d6ea;
+  --sun: #ffc530;
+  --sun-deep: #b07d00;
+  --on-sun: #2b2100;
+  --grass: #1f8a55;
+  --berry: #d63b62;
+  --gold: #b07d00;
+  --font-display: "Huninn", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-num: "Baloo 2", "Huninn", ui-rounded, system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sky: #10142e; --sky-2: #182042; --card: #1d2550; --ink: #eef1ff; --muted: #a7aed2; --line: #313a6c;
+    --sun: #ffd25a; --sun-deep: #ffd25a; --on-sun: #2b2100; --grass: #46c98a; --berry: #ff6b8a; --gold: #ffd25a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --sky: #10142e; --sky-2: #182042; --card: #1d2550; --ink: #eef1ff; --muted: #a7aed2; --line: #313a6c;
+  --sun: #ffd25a; --sun-deep: #ffd25a; --on-sun: #2b2100; --grass: #46c98a; --berry: #ff6b8a; --gold: #ffd25a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; background: var(--sky); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.65; }
+img { max-width: 100%; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--sun-deep); outline-offset: 2px; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.wrap {
+  max-width: 880px; margin: 0 auto;
+  padding-block: 40px 64px;
+  padding-left: max(18px, env(safe-area-inset-left, 0px));
+  padding-right: max(18px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 56px;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; margin: 0; text-wrap: balance; }
+h2 { font-size: 28px; margin-bottom: 14px; }
+h3 { font-size: 19px; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.eyebrow { font-size: 13px; letter-spacing: .14em; color: var(--muted); margin-bottom: 8px; }
+
+/* 開場 */
+.hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: center; }
+.hero h1 { font-size: 56px; line-height: 1.1; margin-bottom: 16px; }
+.hero .pitch { font-family: var(--font-display); font-size: 21px; line-height: 1.6; max-width: 26em; }
+.hero img { width: 100%; max-width: 380px; justify-self: center; filter: drop-shadow(0 18px 24px rgba(20, 24, 70, .18)); }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.btn {
+  display: inline-block; text-decoration: none; font-family: var(--font-display); font-size: 18px;
+  padding: 12px 22px; border-radius: 16px; background: var(--sun); color: var(--on-sun);
+  box-shadow: 0 4px 0 #d99a00;
+}
+.btn.plain { background: var(--card); color: var(--ink); box-shadow: 0 4px 0 var(--line); }
+
+/* 表格 */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 16px; overflow: hidden; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 700; background: var(--sky-2); }
+td:first-child { font-family: var(--font-display); font-size: 17px; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+
+/* 每月流程 */
+.month { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; counter-reset: s; }
+.month li { background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 6px; counter-increment: s; }
+.month li::before { content: counter(s); font-family: var(--font-num); font-weight: 800; font-size: 26px; line-height: 1; color: var(--sun-deep); }
+.month .host { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; margin-top: auto; }
+
+/* 接任務 */
+.steps3 { display: grid; gap: 12px; }
+.step3 { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 4px 14px; background: var(--card); border-radius: 18px; padding: 16px; border: 2px solid var(--line); }
+.step3 b { grid-row: span 2; font-family: var(--font-num); font-size: 34px; line-height: 1; color: var(--sun-deep); text-align: center; }
+.quote { font-family: var(--font-display); font-size: 19px; background: var(--sky-2); border-radius: 14px; padding: 12px 16px; margin-top: 6px; }
+.quote strong { color: var(--berry); font-family: var(--font-num); font-size: 24px; }
+
+/* 結果 */
+.outcomes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.oc { background: var(--card); border-radius: 20px; padding: 16px; border: 3px solid var(--c); display: flex; flex-direction: column; gap: 8px; }
+.oc img { height: 130px; object-fit: contain; align-self: center; }
+.oc h3 { color: var(--c); }
+.oc .when { font-size: 14px; }
+.oc .get { font-size: 14px; background: var(--sky-2); border-radius: 10px; padding: 8px 10px; margin-top: auto; }
+.callout { margin-top: 14px; border-left: 5px solid var(--sun); background: var(--card); padding: 12px 16px; border-radius: 0 14px 14px 0; }
+
+/* 金幣 */
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.box { background: var(--card); border-radius: 18px; padding: 18px; border: 2px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.box ul { margin: 0; padding-left: 1.2em; }
+.formula { font-family: var(--font-display); font-size: 20px; text-align: center; background: var(--sun); color: var(--on-sun); border-radius: 16px; padding: 14px; margin: 14px 0; }
+.ex td, .ex th { text-align: right; }
+.ex td:first-child, .ex th:first-child { text-align: left; }
+.ex tr.pick td { background: var(--sky-2); font-weight: 700; }
+.results { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.results li { background: var(--card); border-radius: 14px; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; border-left: 6px solid var(--c); }
+.results .amt { margin-left: auto; font-family: var(--font-num); font-weight: 800; font-size: 20px; }
+.lesson { font-family: var(--font-display); font-size: 20px; text-align: center; margin-top: 16px; }
+
+/* 口條 */
+.script { display: grid; gap: 10px; }
+.line { background: var(--card); border-radius: 4px 18px 18px 18px; padding: 14px 18px; border: 2px solid var(--line); }
+.line .when { font-size: 13px; color: var(--muted); display: block; margin-bottom: 2px; }
+.line p { font-family: var(--font-display); font-size: 18px; }
+
+footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+
+@media (max-width: 760px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 42px; }
+  .hero img { max-width: 260px; order: -1; }
+  .month { grid-template-columns: 1fr 1fr; }
+  .outcomes, .two { grid-template-columns: 1fr; }
+  .oc img { height: 110px; }
+  td:first-child { white-space: normal; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header class="hero">
+    <div>
+      <p class="eyebrow">親子投資遊戲 · 主持人說明</p>
+      <h1>怪獸遠征隊</h1>
+      <p class="pitch">每位冒險者帶著金幣到公會接委託，組一支怪獸隊伍去冒險。公會每個月付委託金；萬一有怪獸累倒，就得把牠帶回家。</p>
+      <div class="cta">
+        <a class="btn" href="demo.html">試玩玩家手機畫面</a>
+        <a class="btn plain" href="#script">主持人口條</a>
+      </div>
+    </div>
+    <img src="img/turtle_happy.webp" alt="晶殼龜：背上有晶片紋路的青綠色小烏龜">
+  </header>
+
+  <section>
+    <h2>世界觀</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>遊戲裡</th><th>是什麼</th></tr></thead>
+        <tbody>
+          <tr><td>冒險者</td><td>玩家。每人開局有 100 萬金幣。</td></tr>
+          <tr><td>公會</td><td>發委託、付委託金的地方。</td></tr>
+          <tr><td>怪獸</td><td>共 10 隻，每隻有自己的脾氣。一次最多帶 3 隻出發。</td></tr>
+          <tr><td>體力</td><td>怪獸現在的狀態。出發時一律 100%，冒險途中會上下變動，也可能超過 100%。</td></tr>
+          <tr><td>脾氣</td><td>體力起伏有多大。脾氣越大，可能衝很高，也可能一下掉很多。</td></tr>
+          <tr><td>排名</td><td>看誰手上的金幣增加最多。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>一局 6 個月，每個月這樣進行</h2>
+    <ol class="month">
+      <li><h3>公會快報</h3><p>突發事件，例如「雷角馬遇到暴風雨，體力 −15%」。只有第 2、3、5、6 個月有。</p><span class="host">主持人：選怪獸、觸發事件</span></li>
+      <li><h3>接任務</h3><p>大家用 2 分鐘決定這個月接什麼任務，或在營地休息。最後 10 秒會提醒。</p><span class="host">主持人：開始倒數</span></li>
+      <li><h3>冒險</h3><p>怪獸的體力上上下下，大家一起看結果。</p><span class="host">主持人：推進並結算</span></li>
+      <li><h3>月底檢查</h3><p>看哪些任務完成，公布排名。</p><span class="host">主持人：進入下個月</span></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>接任務的三個步驟</h2>
+    <div class="steps3">
+      <div class="step3"><b>1</b><h3>組隊：挑 1～3 隻怪獸</h3><p>任務結束時，<strong>體力最低的那隻</strong>決定任務成不成功。隊伍越多隻，越可能有一隻撐不住。</p></div>
+      <div class="step3"><b>2</b><h3>決定要求的體力（50%～95%）</h3><div><p>公會的委託單上會寫：</p><p class="quote">任務結束那天，每隻怪獸的體力都要在 <strong class="num">80%</strong> 以上。</p><p style="margin-top:8px">要求越高，任務越難，委託金越多。</p></div></div>
+      <div class="step3"><b>3</b><h3>決定帶多少金幣出發</h3><p>一次 1 萬起跳，最多帶全部。也可以選「在營地休息」，這個月金幣不增也不減。</p></div>
+    </div>
+    <p class="muted" style="margin-top:12px">一個任務是 2 個月；第 6 個月剩下的時間不夠，只能接 1 個月的任務。</p>
+  </section>
+
+  <section>
+    <h2>任務的三種結果</h2>
+    <div class="outcomes">
+      <div class="oc" style="--c:var(--gold)">
+        <img src="img/turtle_joy.webp" alt="晶殼龜開心歡呼">
+        <h3>任務提早完成</h3>
+        <p class="when">某個月底，全隊體力都在 100% 以上。</p>
+        <p class="get">本錢全部拿回 ＋ 已經過的月份的委託金</p>
+      </div>
+      <div class="oc" style="--c:var(--grass)">
+        <img src="img/turtle_happy.webp" alt="晶殼龜微笑">
+        <h3>任務完成</h3>
+        <p class="when">結束那天，最弱的那隻也達到要求。</p>
+        <p class="get">本錢全部拿回 ＋ 全部委託金</p>
+      </div>
+      <div class="oc" style="--c:var(--berry)">
+        <img src="img/turtle_worried.webp" alt="晶殼龜緊張冒汗">
+        <h3>帶回家休養</h3>
+        <p class="when">結束那天，最弱的那隻沒達到要求。</p>
+        <p class="get">本錢換成那隻怪獸 ＋ 全部委託金</p>
+      </div>
+    </div>
+    <p class="callout"><strong>只在終點那天檢查要求。</strong>中途體力掉到要求以下，只要結束前爬回來，任務還是成功。這點要跟小朋友講清楚，因為一般遊戲的血條是一掉到底就出局。</p>
+    <p style="margin-top:12px">帶回家休養的怪獸，之後每個月可以決定<strong>送走</strong>（換回金幣），或<strong>繼續養</strong>（等牠恢復體力，但也可能更累）。休養期限到了會自動送走，送走後的下一個月一定要接任務。</p>
+  </section>
+
+  <section>
+    <h2>體力和金幣怎麼連起來</h2>
+    <div class="two">
+      <div class="box">
+        <h3>委託金：穩穩拿到的報酬</h3>
+        <p>公會付錢，是因為你幫它扛了「怪獸累倒」的風險。任務越可能失敗，委託金越多：</p>
+        <ul><li>要求的體力越高</li><li>怪獸脾氣越大</li><li>隊伍越多隻</li></ul>
+        <p class="muted">委託金每個月都發，任務失敗也照拿。</p>
+      </div>
+      <div class="box">
+        <h3>本錢：真正的風險</h3>
+        <p>任務成功，帶出去的金幣全部拿回。</p>
+        <p>任務失敗，換回一隻怪獸，牠的身價照終點體力計算，通常比帶出去的少。</p>
+      </div>
+    </div>
+    <p class="formula">怪獸身價 ＝ 帶出去的金幣 × 終點體力 ÷ 要求的體力</p>
+    <p><strong>最後拿到的 ＝ 本錢（或怪獸身價）＋ 委託金。</strong>跟出發時帶的金幣相比，就是這次賺或賠多少。</p>
+  </section>
+
+  <section>
+    <h2>一個完整的例子</h2>
+    <p>小明家帶 100 萬出發，隊伍是晶殼龜和雷角馬。三種要求的比較（數字為示意）：</p>
+    <div class="table-wrap" style="margin-top:12px">
+      <table class="ex">
+        <thead><tr><th>要求的體力</th><th>每月委託金</th><th>接 10 次，大約幾次帶回家休養</th></tr></thead>
+        <tbody>
+          <tr><td>70%（簡單）</td><td class="num">約 0.2 萬</td><td>不到 1 次</td></tr>
+          <tr class="pick"><td>80%（困難）</td><td class="num">約 1.1 萬</td><td>約 2 次</td></tr>
+          <tr><td>90%（超困難）</td><td class="num">約 3.2 萬</td><td>約 5 次</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px">他們選了 80%，可能的結果：</p>
+    <ul class="results">
+      <li style="--c:var(--gold)"><span>第 1 個月底兩隻都在 100% 以上 → 任務提早完成</span><span class="muted">100 ＋ 1.1</span><span class="amt">101.1 萬</span></li>
+      <li style="--c:var(--grass)"><span>終點時最弱的雷角馬還有 85% → 任務完成</span><span class="muted">100 ＋ 2.2</span><span class="amt">102.2 萬</span></li>
+      <li style="--c:var(--berry)"><span>終點時雷角馬只剩 60% → 帶牠回家休養</span><span class="muted">100 × 60 ÷ 80 ＝ 75，再 ＋ 2.2</span><span class="amt">77.2 萬</span></li>
+    </ul>
+    <p class="lesson">委託金穩穩拿，但賺得不多；真正的風險是本錢可能一次少很多。</p>
+  </section>
+
+  <section id="script">
+    <h2>主持人口條</h2>
+    <div class="script">
+      <div class="line"><span class="when">開場</span><p>「今天每一家都是冒險者，手上有 100 萬金幣。公會有很多委託，要請大家帶怪獸去冒險。」</p></div>
+      <div class="line"><span class="when">介紹任務</span><p>「委託單上會寫：任務結束那天，每隻怪獸的體力都要在幾 % 以上。要求越高越難，公會給的委託金就越多。」</p></div>
+      <div class="line"><span class="when">介紹風險</span><p>「隊伍裡體力最低的那隻決定成敗。如果牠沒達到要求，就要把牠帶回家休養，牠的身價會比你帶出去的金幣少。」</p></div>
+      <div class="line"><span class="when">公會快報</span><p>「公會快報！雷角馬遇到暴風雨，體力下降 15%！已經在路上的隊伍也會受影響喔。」</p></div>
+      <div class="line"><span class="when">倒數</span><p>「最後 10 秒！還沒決定的冒險者，快選一個任務，或回營地休息！」</p></div>
+      <div class="line"><span class="when">結算</span><p>「月底檢查！體力都在 100% 以上的隊伍提早完成任務，恭喜！」</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>給大人的對照：這其實是 FCN</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>遊戲裡</th><th>FCN（固定配息債）</th></tr></thead>
+        <tbody>
+          <tr><td>公會</td><td>銀行（發行商）</td></tr>
+          <tr><td>接任務</td><td>承作 FCN</td></tr>
+          <tr><td>怪獸</td><td>連結標的</td></tr>
+          <tr><td>體力</td><td>股價 ÷ 期初價</td></tr>
+          <tr><td>脾氣</td><td>波動度</td></tr>
+          <tr><td>體力最低的那隻決定成敗</td><td>Worst-of</td></tr>
+          <tr><td>要求的體力</td><td>履約價</td></tr>
+          <tr><td>委託金</td><td>票息</td></tr>
+          <tr><td>任務提早完成</td><td>提前出場（KO，100%）</td></tr>
+          <tr><td>任務完成</td><td>到期還本</td></tr>
+          <tr><td>帶回家休養</td><td>到期接股</td></tr>
+          <tr><td>送走／繼續養</td><td>賣出／續抱持股</td></tr>
+          <tr><td>在營地休息</td><td>保留現金</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    怪獸遠征隊是親子活動用的投資教學遊戲。怪獸與名字皆為原創；除晶殼龜外，正式插畫製作中。
+  </footer>
+</main>
+</body>
+</html>
